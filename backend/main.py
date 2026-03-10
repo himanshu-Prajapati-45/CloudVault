@@ -1,9 +1,14 @@
+import os
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from app.api import files
 
 app = FastAPI(title="CloudVault API")
 
-# CORS middleware placeholder
+os.makedirs("uploaded", exist_ok=True)
+app.mount("/uploaded", StaticFiles(directory="uploaded"), name="uploaded")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -11,6 +16,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(files.router, prefix="/api/files", tags=["files"])
 
 @app.get("/")
 def root():
