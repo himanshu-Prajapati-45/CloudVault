@@ -166,3 +166,23 @@ async def restore_file(file_id: str, current_user: UserOut = Depends(get_current
 
     await files_col.update_one({"_id": ObjectId(file_id)}, {"$set": {"is_trashed": False}})
     return {"message": "Restored successfully"}
+
+@router.post("/{file_id}/share")
+async def generate_share_link(
+    file_id: str,
+    expires_hours: int = 24,
+    current_user: UserOut = Depends(get_current_user)
+):
+    file = await files_col.find_one({"_id": ObjectId(file_id), "user_id": current_user.id})
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    share_token = secrets.token_urlsafe(32)
+    expiry = datetime.utcnow() + timedelta(hours=expires_hours)
+
+    await files_col.update_one(
+        {"_id": ObjectId(file_id)},
+        {"$set": {"share_token": share_token, "share_expires_at": expiry}}
+    )
+
+    return {"share_url": f"/share/{share_token}"}
