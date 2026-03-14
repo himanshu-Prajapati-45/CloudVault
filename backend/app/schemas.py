@@ -17,3 +17,6 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     full_name: Optional[str] = None
+
+class GoogleAuthRequest(BaseModel):
+    credential: str
