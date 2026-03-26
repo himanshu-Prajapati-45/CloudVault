@@ -7,12 +7,24 @@ from app.core.database import db
 
 app = FastAPI(title="CloudVault API")
 
+# Ensure the upload directory exists
 os.makedirs("uploaded", exist_ok=True)
+# Mount the uploaded directory to serve files
 app.mount("/uploaded", StaticFiles(directory="uploaded"), name="uploaded")
+
+from app.core.config import settings
+
+# Build allowed origins: always include localhost for dev, plus FRONTEND_URL for production
+allowed_origins = [
+    "http://localhost:5173", "http://127.0.0.1:5173",
+    "http://localhost:5174", "http://127.0.0.1:5174",
+]
+if settings.FRONTEND_URL and settings.FRONTEND_URL not in allowed_origins:
+    allowed_origins.append(settings.FRONTEND_URL)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -34,7 +46,7 @@ async def health_check():
     mongo_status = "unknown"
 
     try:
-        req = urllib.request.Request("http://localhost:5173", method="HEAD")
+        req = urllib.request.Request(settings.FRONTEND_URL, method="HEAD")
         with urllib.request.urlopen(req, timeout=2) as response:
             if response.status == 200:
                 frontend_status = "connected"
