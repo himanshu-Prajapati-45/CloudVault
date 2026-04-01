@@ -2,7 +2,6 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 const getHeaders = () => {
   const token = localStorage.getItem('token');
-  console.log('API: Using token', token ? 'present' : 'missing');
   return {
     'Authorization': token ? `Bearer ${token}` : '',
     'Content-Type': 'application/json'
@@ -13,7 +12,7 @@ export const loginApi = async (email, password) => {
     const formData = new URLSearchParams();
     formData.append('username', email);
     formData.append('password', password);
-
+    
     const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -50,7 +49,6 @@ export const googleAuthApi = async (credential) => {
 };
 
 export const fetchFilesApi = async () => {
-    console.log('API: Fetching files...');
     const response = await fetch(`${API_URL}/files/`, { headers: getHeaders() });
     if (!response.ok) throw new Error('Failed to fetch files');
     return response.json();
@@ -65,9 +63,8 @@ export const fetchTrashedFilesApi = async () => {
 export const uploadFileApi = async (file) => {
     const formData = new FormData();
     formData.append('file', file);
-
+    
     const token = localStorage.getItem('token');
-    console.log('API: Uploading file', file.name);
     const response = await fetch(`${API_URL}/files/upload`, {
         method: 'POST',
         headers: {

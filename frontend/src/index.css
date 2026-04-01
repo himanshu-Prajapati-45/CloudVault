@@ -1,1 +1,8 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Global setup for light/dark mode root */
+body {
+  margin: 0;
+  font-family: sans-serif;
+}

@@ -11,13 +11,10 @@ export default function Sidebar() {
     useEffect(() => {
         const loadStats = async () => {
             try {
-                console.log("Sidebar: Loading storage stats...");
                 const stats = await fetchStorageStatsApi();
-                console.log("Sidebar: Storage stats loaded", stats);
                 setStorage(stats);
             } catch (err) {
                 console.error("Storage lookup failed", err);
-                console.error("Sidebar: Will use default storage values");
             }
         };
         loadStats();
