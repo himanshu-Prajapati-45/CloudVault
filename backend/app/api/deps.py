@@ -21,9 +21,10 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-
+        
     user = await users_col.find_one({"_id": ObjectId(user_id)})
     if user is None:
         raise credentials_exception
-
-    return UserOut(**{**user, "id": str(user["_id"])})
+        
+    user["id"] = str(user["_id"])
+    return UserOut(**user)

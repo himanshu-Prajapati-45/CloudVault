@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+backend/.env
+
+# Node.js
+node_modules/
+dist/
+dist-ssr/
+*.local
+frontend/.env
+
+# MacOS
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# Uploaded Files
+backend/uploaded/*
+!backend/uploaded/.gitkeep
+
+# Other
+guide/guide.pdf
+guide/*_all_code.txt
+guide/VISUAL_GUIDE.txt
+guide/2.0.txt
+package-lock.json
