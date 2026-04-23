@@ -1,0 +1,68 @@
+.hero-3d-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.hero-3d-full {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* ── Sphere grid ─────────────────────────────────────────── */
+.sphere-grid {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 800px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.sphere-inner {
+  position: relative;
+  width: 90%;
+  height: 80%;
+  transform-style: preserve-3d;
+  transform-box: fill-box;
+}
+
+.sphere {
+  position: absolute;
+  border-radius: 50%;
+  box-shadow: 0 0 20px currentColor;
+  filter: blur(1px);
+  transform: translate(-50%, -50%);
+}
+
+/* ── Floating orbs ────────────────────────────────────────── */
+.floating-shapes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+/* ── Cards tilt ──────────────────────────────────────────── */
+.card-3d-wrapper {
+  perspective: 1000px;
+}
+
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease-out;
+}

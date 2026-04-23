@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
-export default function Header({ onSearch }) {
-    const [isDark, setIsDark] = useState(false);
+export default function Header({ onSearch, isDark, onToggleTheme }) {
+    const [search, setSearch] = useState("");
     const { user } = useAuth();
 
-    // Calculate initials
     const getInitials = (name) => {
         if (!name || typeof name !== 'string') return "US";
         const trimmed = name.trim();
@@ -15,39 +14,45 @@ export default function Header({ onSearch }) {
         return trimmed.substring(0, 2).toUpperCase();
     };
 
-    // Initial check for dark mode on mount
-    useEffect(() => {
-        if (document.documentElement.classList.contains('dark')) {
-            setIsDark(true);
-        }
-    }, []);
-
-    const toggleTheme = () => {
-        setIsDark(!isDark);
-        document.documentElement.classList.toggle('dark');
+    const handleSearchChange = (e) => {
+        setSearch(e.target.value);
+        if (onSearch) onSearch(e.target.value);
     };
 
     return (
-        <header className="h-20 bg-white/70 dark:bg-slate-900/50 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between sticky top-0 z-20 transition-colors duration-300">
+        <header className={`h-20 px-8 flex items-center justify-between transition-colors duration-200 ${
+            isDark
+                ? 'bg-[#0d0f14]/95 backdrop-blur-md border-b border-[#1e2030]'
+                : 'bg-white border-b border-gray-100'
+        }`}>
             <div className="relative w-96 group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg className="w-5 h-5 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 dark:group-focus-within:text-indigo-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className={`absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none transition-colors ${
+                    isDark ? 'text-[#555870] group-focus-within:text-[#4f6ef7]' : 'text-gray-400 group-focus-within:text-indigo-500'
+                }`}>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
                 </div>
                 <input
                     type="text"
                     placeholder="Search files, folders..."
-                    onChange={(e) => onSearch(e.target.value)}
-                    className="w-full bg-slate-100 dark:bg-slate-800/50 border border-transparent dark:border-slate-700 text-slate-900 dark:text-slate-200 text-sm rounded-full pl-11 pr-4 py-2.5 focus:outline-none focus:border-indigo-500 focus:bg-white focus:ring-1 focus:ring-indigo-500 transition-all placeholder-slate-400 dark:placeholder-slate-500"
+                    value={search}
+                    onChange={handleSearchChange}
+                    className={`w-full transition-all focus:outline-none pr-4 ${
+                        isDark
+                            ? 'bg-[#1a1c26] border border-[#2a2d3e] text-[#e8e9f0] placeholder-[#555870] focus:border-[#4f6ef7] focus:ring-1 focus:ring-[#4f6ef7] rounded-full pl-11 py-2.5 text-sm'
+                            : 'bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 rounded-full pl-11 py-2.5 text-sm'
+                    }`}
                 />
             </div>
 
             <div className="flex items-center gap-5">
                 {/* Theme Toggle Button */}
-                <button 
-                    onClick={toggleTheme}
-                    className="p-2 text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-amber-400 transition-colors rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+                <button
+                    onClick={onToggleTheme}
+                    className={`p-2 rounded-full hover:bg-gray-100 dark:hover:bg-[#1e2235] transition-colors ${
+                        isDark ? 'text-[#8b8fa8] hover:text-[#e8e9f0]' : 'text-gray-500 hover:text-gray-900'
+                    }`}
                     title="Toggle Theme"
                 >
                     {isDark ? (
@@ -57,14 +62,14 @@ export default function Header({ onSearch }) {
                     )}
                 </button>
 
-                <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 transition-colors duration-300"></div>
+                <div className={`h-8 w-px ${isDark ? 'bg-[#1e2030]' : 'bg-gray-200'}`}></div>
                 <button className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 border-2 border-white dark:border-slate-700 flex items-center justify-center text-white font-bold select-none shadow-md transition-colors duration-300">
+                    <div className={`w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 border-2 flex items-center justify-center text-white font-bold select-none shadow-md transition-colors duration-200 ${isDark ? 'border-[#1f2130]' : 'border-white'}`}>
                         {getInitials(user?.name)}
                     </div>
                     <div className="text-left hidden sm:block">
-                        <p className="text-sm font-medium text-slate-900 dark:text-white transition-colors duration-300">{user?.name || "User"}</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 transition-colors duration-300">Personal Account</p>
+                        <p className={`text-sm font-medium transition-colors duration-200 ${isDark ? 'text-[#e8e9f0]' : 'text-gray-900'}`}>{user?.name || "User"}</p>
+                        <p className={`text-xs transition-colors duration-200 ${isDark ? 'text-[#8b8fa8]' : 'text-gray-500'}`}>Personal Account</p>
                     </div>
                 </button>
             </div>

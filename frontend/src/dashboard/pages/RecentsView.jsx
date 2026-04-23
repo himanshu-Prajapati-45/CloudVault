@@ -7,7 +7,6 @@ export default function RecentsView() {
     const { files, setFiles } = useOutletContext();
     const [fileToShare, setFileToShare] = useState(null);
 
-    // Only operate on files that are not strictly deleted
     const activeFiles = files.filter(f => !f.deleted);
 
     const handleDelete = (fileToDelete) => {
@@ -17,18 +16,15 @@ export default function RecentsView() {
 
     return (
         <div className="max-w-7xl mx-auto relative">
-            {/* Page Title & Actions */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight transition-colors duration-300">Recent Files</h1>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm transition-colors duration-300">Files you have uploaded or interacted with recently will appear here.</p>
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-[#e8e9f0] mb-2 tracking-tight">Recent Files</h1>
+                    <p className="text-gray-500 dark:text-[#8b8fa8] text-sm">Files you have uploaded or interacted with recently will appear here.</p>
                 </div>
             </div>
-            
-            {/* File Grid */}
+
             <FileGrid files={activeFiles} onShare={(file) => setFileToShare(file)} onDelete={handleDelete} />
 
-            {/* Share Modal Portal */}
             {fileToShare && <ShareModal file={fileToShare} onClose={() => setFileToShare(null)} />}
         </div>
     );

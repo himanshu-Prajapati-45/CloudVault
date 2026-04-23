@@ -1,8 +1,34 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Global setup for light/dark mode root */
-body {
+html, body {
   margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+  background-color: #ffffff;
+  color: #111827;
+}
+
+body {
   font-family: sans-serif;
+}
+
+/* Reset for all elements to prevent unexpected spacing */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Float animation for background icons */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+.animate-float {
+  animation: float var(--float-duration, 6s) ease-in-out infinite;
+}
+
+/* Smooth transitions for theme switching */
+.theme-transition {
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
 }
