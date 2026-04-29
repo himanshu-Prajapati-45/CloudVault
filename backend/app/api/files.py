@@ -57,14 +57,26 @@ async def list_files(current_user: UserOut = Depends(get_current_user)):
     cursor = files_col.find({"user_id": current_user.id, "is_trashed": {"$ne": True}}).sort("uploaded_at", -1)
     files = await cursor.to_list(length=100)
 
+    now = datetime.utcnow()
     for f in files:
         f["id"] = str(f["_id"])
         del f["_id"]
         f["url"] = generate_presigned_url(f["s3_key"])
         if f.get("share_token"):
-            f["share_token"] = f["share_token"]
-            f["share_expires_at"] = f.get("share_expires_at")
-            f["share_password"] = bool(f.get("share_password_hash"))
+            expires_at = f.get("share_expires_at")
+            # Auto-revoke expired share links
+            if expires_at and expires_at < now:
+                await files_col.update_one(
+                    {"_id": ObjectId(f["id"])},
+                    {"$unset": {"share_token": "", "share_expires_at": "", "share_password_hash": "", "share_created_at": ""}}
+                )
+                f["share_token"] = None
+                f["share_expires_at"] = None
+                f["share_password"] = None
+            else:
+                f["share_token"] = f["share_token"]
+                f["share_expires_at"] = expires_at.isoformat() + "Z" if expires_at else None
+                f["share_password"] = bool(f.get("share_password_hash"))
         else:
             f["share_token"] = None
             f["share_expires_at"] = None
@@ -83,8 +95,9 @@ async def list_trashed_files(current_user: UserOut = Depends(get_current_user)):
         del f["_id"]
         f["url"] = generate_presigned_url(f["s3_key"])
         if f.get("share_token"):
+            expires_at = f.get("share_expires_at")
             f["share_token"] = f["share_token"]
-            f["share_expires_at"] = f.get("share_expires_at")
+            f["share_expires_at"] = expires_at.isoformat() + "Z" if expires_at else None
             f["share_password"] = bool(f.get("share_password_hash"))
         else:
             f["share_token"] = None
@@ -207,7 +220,7 @@ async def generate_share_link(
 
     await files_col.update_one({"_id": ObjectId(file_id)}, {"$set": update})
 
-    return {"share_url": f"/share/{share_token}", "expires_at": expiry.isoformat()}
+    return {"share_url": f"/share/{share_token}", "expires_at": expiry.isoformat() + "Z"}
 
 
 @router.delete("/{file_id}/share")

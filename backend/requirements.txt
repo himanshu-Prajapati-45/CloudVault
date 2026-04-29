@@ -12,4 +12,5 @@ python-multipart
 python-dotenv
 pydantic-settings
 requests
+httpx
 dnspython

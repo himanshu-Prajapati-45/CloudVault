@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://wasd1.onrender.com/api/:path*" },
+    { "source": "/((?!assets|_next/static|favicon|icons).*)", "destination": "/index.html" }
+  ]
+}

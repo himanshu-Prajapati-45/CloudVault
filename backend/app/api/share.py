@@ -14,7 +14,15 @@ async def access_shared_file(
     password: Optional[str] = Query(None)
 ):
     file = await files_col.find_one({"share_token": token})
-    if not file or file.get("share_expires_at", datetime.min) < datetime.utcnow():
+    if not file:
+        raise HTTPException(status_code=404, detail="Link expired or invalid")
+
+    if file.get("share_expires_at", datetime.min) < datetime.utcnow():
+        # Auto-clean expired share fields from the document
+        await files_col.update_one(
+            {"_id": file["_id"]},
+            {"$unset": {"share_token": "", "share_expires_at": "", "share_password_hash": "", "share_created_at": ""}}
+        )
         raise HTTPException(status_code=404, detail="Link expired or invalid")
 
     # Check password protection
