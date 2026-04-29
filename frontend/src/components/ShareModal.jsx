@@ -59,12 +59,10 @@ export default function ShareModal({ file, onClose, onShareCreated }) {
       setTimeout(() => setCopied(false), 2000);
 
       if (onShareCreated) {
-        const expiresAt = new Date();
-        expiresAt.setHours(expiresAt.getHours() + expiryHours);
         onShareCreated({
           ...file,
           share_token: token,
-          share_expires_at: expiresAt.toISOString(),
+          share_expires_at: result.expires_at,
           share_password: passwordEnabled ? true : null
         });
       }

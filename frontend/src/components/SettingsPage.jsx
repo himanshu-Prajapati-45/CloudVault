@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { User, Shield, Bell, HardDrive, Key, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { User, Shield, Bell, HardDrive, Key, CheckCircle2, AlertCircle, Eye, EyeOff, Wifi, WifiOff } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useOutletContext } from 'react-router-dom';
-import { changePasswordApi } from '../services/api';
+import { changePasswordApi, healthCheckApi } from '../services/api';
 
 function formatBytes(bytes) {
   if (!bytes || bytes === 0) return '0 B';
@@ -18,6 +18,7 @@ export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState('profile');
   const [name, setName] = useState(user?.name || '');
   const [saveStatus, setSaveStatus] = useState('idle');
+  const [backendStatus, setBackendStatus] = useState('checking'); // 'checking' | 'connected' | 'disconnected'
   const [notifications, setNotifications] = useState([
     { id: 1, label: 'Email notifications', desc: 'Receive email alerts for file activity', enabled: true },
     { id: 2, label: 'Upload alerts', desc: 'Notify when files finish uploading', enabled: true },
@@ -39,6 +40,21 @@ export default function SettingsPage() {
   useEffect(() => {
     if (user?.name) setName(user.name);
   }, [user]);
+
+  // Check backend connection on mount
+  useEffect(() => {
+    const checkBackend = async () => {
+      try {
+        await healthCheckApi();
+        setBackendStatus('connected');
+      } catch {
+        setBackendStatus('disconnected');
+      }
+    };
+    checkBackend();
+    const interval = setInterval(checkBackend, 30000); // check every 30s
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSaveProfile = async () => {
     setSaveStatus('saving');
@@ -130,6 +146,36 @@ export default function SettingsPage() {
           {activeSection === 'profile' && (
             <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-6">
               <h3 className="text-gray-900 dark:text-white mb-4 text-sm font-medium">Profile Information</h3>
+              {/* Connection Status */}
+              <div className={`flex items-center gap-3 p-3 mb-6 rounded-lg border ${
+                backendStatus === 'connected'
+                  ? 'bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800'
+                  : backendStatus === 'disconnected'
+                  ? 'bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800'
+                  : 'bg-gray-50 dark:bg-gray-700 border-gray-100 dark:border-gray-600'
+              }`}>
+                {backendStatus === 'connected' ? (
+                  <Wifi size={16} className="text-green-600 dark:text-green-400 flex-shrink-0" />
+                ) : backendStatus === 'disconnected' ? (
+                  <WifiOff size={16} className="text-red-600 dark:text-red-400 flex-shrink-0" />
+                ) : (
+                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin flex-shrink-0" />
+                )}
+                <div className="min-w-0">
+                  <p className={`text-sm font-medium ${
+                    backendStatus === 'connected'
+                      ? 'text-green-700 dark:text-green-300'
+                      : backendStatus === 'disconnected'
+                      ? 'text-red-700 dark:text-red-300'
+                      : 'text-gray-500 dark:text-gray-400'
+                  }`}>
+                    {backendStatus === 'connected' ? 'Frontend connected to Backend' : backendStatus === 'disconnected' ? 'Frontend cannot reach Backend' : 'Checking connection...'}
+                  </p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
+                    {backendStatus === 'connected' ? 'Backend is running and responsive' : backendStatus === 'disconnected' ? 'Check if backend server is running on port 8000' : 'Pinging backend server...'}
+                  </p>
+                </div>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Full Name</label>

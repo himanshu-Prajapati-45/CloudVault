@@ -150,7 +150,7 @@ export default function PublicSharedPage() {
       <header className="w-full flex items-center justify-between px-4 sm:px-6 md:px-12 py-4 bg-white dark:bg-[#0d0f14] border-b border-gray-200 dark:border-[#1f2130] flex-shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg flex items-center justify-center">
-            <img src="/src/assets/logo.png" alt="CloudVault" className="w-full h-full object-cover rounded-lg" />
+            <img src="/logo.png" alt="CloudVault" className="w-full h-full object-cover rounded-lg" />
           </div>
           <span className="text-gray-900 dark:text-[#e8e9f0] text-sm tracking-tight">CloudVault</span>
           <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full bg-[#4f6ef7]/20 text-[10px] text-[#4f6ef7] uppercase tracking-wider">Public Link</span>

@@ -38,7 +38,7 @@ export default function Sidebar({ isDark, onToggleTheme }) {
             {/* Logo Area */}
             <div className="h-20 flex items-center px-8 border-b border-[#1e2030]">
                 <div className="flex items-center gap-3">
-                    <img src="/src/assets/logo.png" alt="CloudVault" className="w-10 h-10 rounded-xl object-contain" />
+                    <img src="/logo.png" alt="CloudVault" className="w-10 h-10 rounded-xl object-contain" />
                     <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#e8e9f0] to-[#8b8fa8]">CloudVault</span>
                 </div>
             </div>

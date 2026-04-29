@@ -286,7 +286,7 @@ export default function LoginPage({ initialTab = 'signin' }) {
 						<ArrowLeft size={16} className="text-gray-500" />
 					</button>
 					<div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-						<img src="/src/assets/logo.png" alt="CloudVault" className="w-full h-full object-cover rounded-xl" />
+						<img src="/logo.png" alt="CloudVault" className="w-full h-full object-cover rounded-xl" />
 					</div>
 					<span className="text-gray-900 tracking-tight font-semibold">CloudVault</span>
 				</div>
@@ -302,7 +302,7 @@ export default function LoginPage({ initialTab = 'signin' }) {
 			<div className="hidden lg:flex min-h-screen w-full bg-gradient-to-br from-indigo-50 via-white to-blue-50">
 				{/* Left Side - Image */}
 				<div className="w-5/12 relative overflow-hidden">
-					<img src="/src/assets/123.png" alt="Cloud Storage" className="w-full h-full object-cover" />
+					<img src="/123.png" alt="Cloud Storage" className="w-full h-full object-cover" />
 
 					{/* Overlay header */}
 					<div className="absolute top-0 left-0 right-0 p-8 z-20">
@@ -314,7 +314,7 @@ export default function LoginPage({ initialTab = 'signin' }) {
 								<ArrowLeft size={16} className="text-white/70" />
 							</button>
 							<div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-								<img src="/src/assets/logo.png" alt="CloudVault" className="w-full h-full object-cover rounded-xl" />
+								<img src="/logo.png" alt="CloudVault" className="w-full h-full object-cover rounded-xl" />
 							</div>
 							<span className="text-white/90 tracking-tight font-semibold">CloudVault</span>
 						</div>

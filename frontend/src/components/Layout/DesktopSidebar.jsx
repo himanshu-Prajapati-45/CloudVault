@@ -34,7 +34,7 @@ export default function DesktopSidebar({
         className={`h-14 flex items-center px-5 gap-3 flex-shrink-0 border-b ${isDark ? 'border-[#1e2030]' : 'border-gray-200'}`}
       >
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/30">
-          <img src="/src/assets/logo.png" alt="CloudVault" className="w-full h-full object-cover rounded-xl" />
+          <img src="/logo.png" alt="CloudVault" className="w-full h-full object-cover rounded-xl" />
         </div>
         <motion.span
           animate={{ opacity: expanded ? 1 : 0, x: expanded ? 0 : -8 }}

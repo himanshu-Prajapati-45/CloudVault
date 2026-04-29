@@ -21,11 +21,11 @@ export default function RecentActivity({ files, onSelectFile }) {
             <div className="w-7 h-7 rounded-lg bg-gray-100 dark:bg-[#1e2235] group-hover:bg-gray-200 dark:group-hover:bg-[#1a1c26] flex items-center justify-center flex-shrink-0 mt-0.5 transition-colors">
               <Upload size={12} className="text-gray-400 dark:text-[#555870]" />
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-gray-500 dark:text-[#8b8fa8] leading-relaxed">
+            <div className="flex-1 min-w-0 overflow-hidden">
+              <p className="text-xs text-gray-500 dark:text-[#8b8fa8] leading-relaxed truncate">
                 <span className="text-gray-900 dark:text-[#e8e9f0]">You</span>{' '}
                 uploaded{' '}
-                <span className="text-gray-500 dark:text-[#8b8fa8] truncate underline decoration-gray-200 dark:decoration-[#1e2030] underline-offset-2 group-hover:text-gray-900 dark:group-hover:text-[#e8e9f0] group-hover:decoration-gray-300 dark:group-hover:decoration-[#555870] transition-colors">{file.name}</span>
+                <span className="text-gray-500 dark:text-[#8b8fa8] underline decoration-gray-200 dark:decoration-[#1e2030] underline-offset-2 group-hover:text-gray-900 dark:group-hover:text-[#e8e9f0] group-hover:decoration-gray-300 dark:group-hover:decoration-[#555870] transition-colors">{file.name}</span>
               </p>
               <p className="text-[10px] text-gray-500 dark:text-[#555870] mt-0.5">{file.date}</p>
             </div>

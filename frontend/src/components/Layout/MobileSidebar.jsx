@@ -18,7 +18,7 @@ export default function MobileSidebar({
     } ${isDark ? 'bg-[#0a0c10] border-r border-[#1f2130]' : 'bg-white border-r border-gray-200'}`}>
       <div className={`h-14 flex items-center px-5 gap-3 flex-shrink-0 border-b ${isDark ? 'border-[#1e2030]' : 'border-gray-200'}`}>
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-indigo-500/30">
-          <img src="/src/assets/logo.png" alt="CloudVault" className="w-full h-full object-cover rounded-xl" />
+          <img src="/logo.png" alt="CloudVault" className="w-full h-full object-cover rounded-xl" />
         </div>
         <span className={`tracking-tight font-semibold ${isDark ? 'text-[#e8e9f0]' : 'text-gray-900'}`}>CloudVault</span>
         <button className={`ml-auto transition-colors ${isDark ? 'text-[#555870] hover:text-[#e8e9f0]' : 'text-gray-400 hover:text-gray-600'}`} onClick={() => setIsMobileMenuOpen(false)}>

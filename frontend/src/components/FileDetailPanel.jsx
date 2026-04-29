@@ -18,10 +18,13 @@ function formatExpiry(dateStr) {
   if (!dateStr) return 'No expiry';
   const diff = new Date(dateStr) - new Date();
   if (diff < 0) return 'Expired';
-  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const totalMinutes = Math.floor(diff / (1000 * 60));
+  const hours = Math.floor(totalMinutes / 60);
   const days = Math.floor(hours / 24);
-  if (days > 0) return `${days} day${days !== 1 ? 's' : ''} left`;
-  return `${hours} hour${hours !== 1 ? 's' : ''} left`;
+  const minutes = totalMinutes % 60;
+  if (days > 0) return `${days}d ${hours % 24}h left`;
+  if (hours > 0) return `${hours}h ${minutes}m left`;
+  return `${minutes}m left`;
 }
 
 export default function FileDetailPanel({ file, onClose, onDelete, onDownload, onShare, onShareCreated }) {

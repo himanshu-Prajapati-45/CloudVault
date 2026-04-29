@@ -1,11 +1,58 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
+const SESSION_TIMEOUT_MS = 7 * 60 * 1000; // 7 minutes
+
 const getHeaders = () => {
   const token = localStorage.getItem('token');
-  return {
-    'Authorization': token ? `Bearer ${token}` : '',
-    'Content-Type': 'application/json'
-  };
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return headers;
+};
+
+/** Check if the session has expired based on stored login timestamp */
+const isSessionExpired = () => {
+  const loginTime = localStorage.getItem('login_time');
+  if (!loginTime) return false;
+  return Date.now() - parseInt(loginTime, 10) > SESSION_TIMEOUT_MS;
+};
+
+/** Force logout — clear storage and redirect to login */
+const forceLogout = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user_name');
+  localStorage.removeItem('user_email');
+  localStorage.removeItem('auth_provider');
+  localStorage.removeItem('login_time');
+  // Only redirect if not already on login/public pages
+  if (window.location.pathname.startsWith('/dashboard') || window.location.pathname.startsWith('/api')) {
+    window.location.href = '/login';
+  }
+};
+
+/**
+ * Wrapper around fetch for authenticated requests.
+ * - Checks session expiry BEFORE the request
+ * - Catches 401 responses and auto-logouts
+ */
+const authFetch = async (url, options = {}) => {
+  if (isSessionExpired()) {
+    forceLogout();
+    throw new Error('Session expired');
+  }
+  const response = await fetch(url, options);
+  if (response.status === 401) {
+    forceLogout();
+    throw new Error('Session expired');
+  }
+  return response;
+};
+
+export const healthCheckApi = async () => {
+    const response = await fetch(`${API_URL.replace('/api', '')}/health`, {
+        headers: { 'Content-Type': 'application/json' }
+    });
+    if (!response.ok) throw new Error('Backend unreachable');
+    return response.json();
 };
 
 export const loginApi = async (email, password) => {
@@ -49,18 +96,21 @@ export const googleAuthApi = async (credential) => {
 };
 
 export const fetchFilesApi = async () => {
-    const response = await fetch(`${API_URL}/files/`, { headers: getHeaders() });
+    const response = await authFetch(`${API_URL}/files/`, { headers: getHeaders() });
     if (!response.ok) throw new Error('Failed to fetch files');
     return response.json();
 };
 
 export const fetchTrashedFilesApi = async () => {
-    const response = await fetch(`${API_URL}/files/trash`, { headers: getHeaders() });
+    const response = await authFetch(`${API_URL}/files/trash`, { headers: getHeaders() });
     if (!response.ok) throw new Error('Failed to fetch trash');
     return response.json();
 };
 
 export const uploadFileApi = async (file, onProgress) => {
+    // Check session before starting upload
+    if (isSessionExpired()) { forceLogout(); throw new Error('Session expired'); }
+
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         const formData = new FormData();
@@ -88,6 +138,9 @@ export const uploadFileApi = async (file, onProgress) => {
                 } catch {
                     resolve(JSON.parse(xhr.responseText));
                 }
+            } else if (xhr.status === 401) {
+                forceLogout();
+                reject(new Error('Session expired'));
             } else {
                 try {
                     const err = JSON.parse(xhr.responseText);
@@ -104,7 +157,7 @@ export const uploadFileApi = async (file, onProgress) => {
 };
 
 export const deleteFileApi = async (fileId) => {
-    const response = await fetch(`${API_URL}/files/${fileId}`, {
+    const response = await authFetch(`${API_URL}/files/${fileId}`, {
         method: 'DELETE',
         headers: getHeaders()
     });
@@ -113,7 +166,7 @@ export const deleteFileApi = async (fileId) => {
 };
 
 export const permanentDeleteFileApi = async (fileId) => {
-    const response = await fetch(`${API_URL}/files/${fileId}/permanent`, {
+    const response = await authFetch(`${API_URL}/files/${fileId}/permanent`, {
         method: 'DELETE',
         headers: getHeaders()
     });
@@ -122,7 +175,7 @@ export const permanentDeleteFileApi = async (fileId) => {
 };
 
 export const restoreFileApi = async (fileId) => {
-    const response = await fetch(`${API_URL}/files/${fileId}/restore`, {
+    const response = await authFetch(`${API_URL}/files/${fileId}/restore`, {
         method: 'POST',
         headers: getHeaders()
     });
@@ -131,7 +184,7 @@ export const restoreFileApi = async (fileId) => {
 };
 
 export const searchFilesApi = async (query) => {
-    const response = await fetch(`${API_URL}/files/search?q=${encodeURIComponent(query)}`, {
+    const response = await authFetch(`${API_URL}/files/search?q=${encodeURIComponent(query)}`, {
         headers: getHeaders()
     });
     if (!response.ok) throw new Error('Search failed');
@@ -139,7 +192,7 @@ export const searchFilesApi = async (query) => {
 };
 
 export const fetchStorageStatsApi = async () => {
-    const response = await fetch(`${API_URL}/files/storage-stats`, {
+    const response = await authFetch(`${API_URL}/files/storage-stats`, {
         headers: getHeaders()
     });
     if (!response.ok) throw new Error('Failed to fetch storage stats');
@@ -154,13 +207,13 @@ export const shareFileApi = async (fileId, expiresHours = 24, password = null) =
     if (password) {
         options.body = JSON.stringify({ password });
     }
-    const response = await fetch(`${API_URL}/files/${fileId}/share?expires_hours=${expiresHours}`, options);
+    const response = await authFetch(`${API_URL}/files/${fileId}/share?expires_hours=${expiresHours}`, options);
     if (!response.ok) throw new Error('Failed to generate share link');
     return response.json();
 };
 
 export const revokeShareApi = async (fileId) => {
-    const response = await fetch(`${API_URL}/files/${fileId}/share`, {
+    const response = await authFetch(`${API_URL}/files/${fileId}/share`, {
         method: 'DELETE',
         headers: getHeaders()
     });
@@ -169,7 +222,7 @@ export const revokeShareApi = async (fileId) => {
 };
 
 export const changePasswordApi = async (currentPassword, newPassword) => {
-    const response = await fetch(`${API_URL}/auth/change-password`, {
+    const response = await authFetch(`${API_URL}/auth/change-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getHeaders() },
         body: JSON.stringify({ current_password: currentPassword, new_password: newPassword })
@@ -182,7 +235,7 @@ export const changePasswordApi = async (currentPassword, newPassword) => {
 };
 
 export const fetchMeApi = async () => {
-    const response = await fetch(`${API_URL}/auth/me`, {
+    const response = await authFetch(`${API_URL}/auth/me`, {
         headers: getHeaders()
     });
     if (!response.ok) throw new Error('Failed to fetch user profile');

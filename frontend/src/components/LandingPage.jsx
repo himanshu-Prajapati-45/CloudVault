@@ -51,7 +51,7 @@ function Navbar() {
           {/* Logo */}
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate(token ? '/dashboard' : '/')}>
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center">
-              <img src="/src/assets/logo.png" alt="CloudVault" className="w-full h-full object-cover rounded-xl" />
+              <img src="/logo.png" alt="CloudVault" className="w-full h-full object-cover rounded-xl" />
             </div>
             <span className="text-white font-bold tracking-tight">CloudVault</span>
           </div>

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { revokeShareApi } from '../../services/api';
 import { Link2, Copy, Check, X, Clock, Shield, Loader2, AlertCircle } from 'lucide-react';
@@ -8,10 +8,29 @@ export default function SharedLinksView() {
     const [copiedId, setCopiedId] = useState(null);
     const [revoking, setRevoking] = useState(null);
     const [error, setError] = useState(null);
+    const [, setTick] = useState(0); // force re-render for countdown
 
     const sharedFiles = useMemo(() => {
         return files.filter(f => f.share_token && !f.deleted);
     }, [files]);
+
+    // Auto-refresh every 30s to update countdowns and remove expired links
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTick(t => t + 1);
+            // Auto-remove expired links from UI
+            setFiles(prev => prev.map(f => {
+                if (f.share_token && f.share_expires_at) {
+                    const diff = new Date(f.share_expires_at) - new Date();
+                    if (diff < 0) {
+                        return { ...f, share_token: null, share_expires_at: null, share_password: null };
+                    }
+                }
+                return f;
+            }));
+        }, 30000);
+        return () => clearInterval(interval);
+    }, [setFiles]);
 
     const handleCopy = (file) => {
         const shareUrl = `${window.location.origin}/share/${file.share_token}`;
@@ -40,10 +59,13 @@ export default function SharedLinksView() {
         const now = new Date();
         const diff = date - now;
         if (diff < 0) return 'Expired';
-        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const totalMinutes = Math.floor(diff / (1000 * 60));
+        const hours = Math.floor(totalMinutes / 60);
         const days = Math.floor(hours / 24);
-        if (days > 0) return `${days} day${days > 1 ? 's' : ''} left`;
-        return `${hours} hour${hours > 1 ? 's' : ''} left`;
+        const minutes = totalMinutes % 60;
+        if (days > 0) return `${days}d ${hours % 24}h left`;
+        if (hours > 0) return `${hours}h ${minutes}m left`;
+        return `${minutes}m left`;
     };
 
     if (sharedFiles.length === 0) {
